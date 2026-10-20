@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Роды и жанры литературы · путеводитель</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', 'Palatino', serif;
+            color: #2e241c;
+            line-height: 1.65;
+            min-height: 100vh;
+            background-color: #e8dccd;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(255, 245, 230, 0.5) 0%, transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(220, 200, 170, 0.4) 0%, transparent 40%),
+                repeating-linear-gradient(45deg, rgba(200, 180, 150, 0.08) 0px, rgba(200, 180, 150, 0.08) 2px, transparent 2px, transparent 6px);
+            background-size: 100% 100%, 100% 100%, 12px 12px;
+            display: flex;
+            justify-content: center;
+            padding: 2.5rem 1rem;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.04"/></svg>');
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .scroll-container {
+            max-width: 1150px;
+            width: 100%;
+            background: #fcf8f2;
+            background-image: linear-gradient(145deg, #fffcf7 0%, #f5ede1 100%);
+            border-radius: 3rem 3rem 2rem 2rem;
+            padding: 4.5rem 2.8rem 2.8rem;
+            box-shadow:
+                0 40px 70px -30px rgba(60, 40, 20, 0.5),
+                inset 0 1px 4px rgba(255, 255, 255, 0.9),
+                0 0 0 1px #dccfbc;
+            position: relative;
+            z-index: 2;
+            border-left: 2px solid #e3d6c5;
+            border-right: 2px solid #e3d6c5;
+        }
+
+        /* ===== ЗАКЛАДКА (правый верхний угол) ===== */
+        .bookmark {
+            position: absolute;
+            top: -22px;
+            right: 48px;
+            width: 46px;
+            height: 118px;
+            background: linear-gradient(135deg, #a33d3d 0%, #6e1f1f 100%);
+            border-radius: 4px 4px 14px 14px;
+            box-shadow:
+                0 12px 18px -8px rgba(0, 0, 0, 0.45),
+                inset 0 1px 2px rgba(255, 220, 180, 0.4);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .bookmark:hover {
+            transform: translateY(2px) rotate(-0.5deg);
+            box-shadow: 0 16px 22px -8px rgba(0, 0, 0, 0.55);
+        }
+        .bookmark:active {
+            transform: translateY(4px) scale(0.97);
+        }
+        .bookmark::before {
+            content: "❧";
+            font-size: 1.7rem;
+            color: #f3dcb6;
+            opacity: 0.85;
+            text-shadow: 0 1px 0 #3d0f0f;
+            pointer-events: none;
+        }
+        .bookmark::after {
+            content: "";
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 100%;
+            height: 14px;
+            background:
+                linear-gradient(to bottom right, #6e1f1f 50%, transparent 50%) left top / 50% 100% no-repeat,
+                linear-gradient(to bottom left,  #6e1f1f 50%, transparent 50%) right top / 50% 100% no-repeat;
+            pointer-events: none;
+        }
+
+        /* ===== ВСПЛЫВАЮЩЕЕ ФОТО (без искажений) ===== */
+        .surprise-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.25); /* легкое затемнение, чтобы фото читалось */
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+        .surprise-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .surprise-overlay img {
+            max-width: min(92vw, 760px);
+            max-height: 82vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.85);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            image-rendering: auto;
+        }
+        .surprise-overlay.visible img {
+            transform: scale(1);
+        }
+
+        /* Типографика */
+        h1 {
+            font-size: 2.9rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: #3d2e22;
+            margin-bottom: 0.3rem;
+            line-height: 1.2;
+            padding-left: 0.2rem;
+        }
+        h1 .sub {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #7b6b5b;
+            display: block;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 0.25rem;
+            font-family: 'Segoe UI', 'Helvetica', sans-serif;
+            border-bottom: 1px solid #d9caba;
+            padding-bottom: 0.7rem;
+        }
+
+        .lead {
+            font-size: 1.15rem;
+            color: #4d3f33;
+            margin: 1.2rem 0 2.2rem;
+            padding: 0.8rem 1.5rem;
+            background: #f3ebe1;
+            border-radius: 0 40px 40px 0;
+            border-left: 6px solid #b29576;
+            font-style: italic;
+            box-shadow: inset 0 1px 4px rgba(255, 255, 255, 0.8);
+        }
+
+        .genus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.8rem;
+            margin: 2.5rem 0 2.8rem;
+        }
+
+        .genus-card {
+            background: #fffdfa;
+            border-radius: 1.6rem 1.6rem 1.2rem 1.2rem;
+            padding: 1.8rem 1.5rem 1.5rem;
+            box-shadow: 0 12px 22px -10px rgba(100, 70, 40, 0.2), inset 0 1px 0 #fff;
+            border: 1px solid #e2d5c6;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .genus-card:hover {
+            box-shadow: 0 20px 30px -12px rgba(80, 50, 25, 0.3);
+            border-color: #cbb59d;
+            background: #fffefc;
+            transform: translateY(-4px);
+        }
+        .genus-card h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3e2c1e;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .genus-card h2 span { font-size: 2rem; line-height: 1; }
+        .genus-sub {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #9f8b78;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed #ddcfc0;
+            padding-bottom: 0.6rem;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .genus-desc {
+            font-size: 0.98rem;
+            color: #3e332b;
+            margin-bottom: 0.9rem;
+            flex: 1;
+        }
+        .genus-desc strong { color: #5f3c26; font-weight: 700; }
+        .genus-examples {
+            background: #efe7dd;
+            border-radius: 100px;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.83rem;
+            color: #4f4034;
+            font-weight: 500;
+            display: inline-block;
+            align-self: flex-start;
+            border: 1px solid #dbcebe;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .section-heading {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #3a2b1f;
+            margin: 2.8rem 0 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 2px solid #e3d5c4;
+            padding-bottom: 0.6rem;
+        }
+        .section-heading::before {
+            content: "❦";
+            font-size: 2.2rem;
+            color: #b38e6b;
+            line-height: 1;
+        }
+
+        .genres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 1.6rem;
+            margin: 1.5rem 0 2.2rem;
+        }
+
+        .genre-block {
+            background: #faf6f0;
+            border-radius: 2rem 0.8rem 2rem 0.8rem;
+            padding: 1.6rem 1.5rem 1.3rem;
+            border: 1px solid #e2d4c4;
+            box-shadow: inset 0 1px 6px #fff, 0 6px 14px -8px rgba(90, 60, 30, 0.15);
+            transition: all 0.2s;
+        }
+        .genre-block:hover {
+            background: #fffcf7;
+            border-color: #c9b49d;
+        }
+        .genre-block h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #4d3422;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            border-left: 5px solid #b38e6b;
+            padding-left: 0.9rem;
+        }
+        .genre-block h3 i { font-size: 1.6rem; color: #8a6e53; }
+
+        .genre-list { list-style: none; display: flex; flex-direction: column; gap: 0.9rem; }
+        .genre-list li {
+            font-size: 0.95rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0.4rem 0.7rem;
+            padding-bottom: 0.35rem;
+            border-bottom: 1px dotted #e6d9cb;
+            font-family: 'Segoe UI', 'Helvetica', sans-serif;
+            color: #2e241e;
+        }
+        .genre-list li:last-child { border-bottom: none; }
+        .genre-list li strong {
+            font-weight: 700;
+            color: #4c3522;
+            min-width: 95px;
+            font-family: 'Georgia', serif;
+            font-size: 0.98rem;
+        }
+        .genre-list li span {
+            color: #655649;
+            font-size: 0.88rem;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .howto-box {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1.5rem;
+            background: linear-gradient(135deg, #f2e9df 0%, #e8dbcc 100%);
+            border-radius: 2.5rem;
+            padding: 2rem 2.2rem;
+            margin: 2.5rem 0 1.8rem;
+            border: 1px solid #dccdbc;
+            box-shadow: inset 0 2px 6px rgba(255, 250, 240, 0.8), 0 6px 14px -8px rgba(80, 50, 20, 0.2);
+        }
+        .howto-step {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            flex: 1 1 250px;
+        }
+        .howto-num {
+            width: 3rem;
+            height: 3rem;
+            background: #4d3422;
+            color: #f2e1cd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            box-shadow: 0 4px 8px rgba(40, 20, 5, 0.3);
+            flex-shrink: 0;
+        }
+        .howto-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #2d221b;
+        }
+        .howto-text small {
+            display: block;
+            font-weight: 400;
+            color: #5d4d3f;
+            font-size: 0.88rem;
+            margin-top: 0.2rem;
+            font-style: italic;
+        }
+
+        .modern-note {
+            background: #eae0d4;
+            border-radius: 1.5rem;
+            padding: 1.3rem 2rem;
+            margin: 2rem 0 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 2.5rem;
+            justify-content: space-between;
+            border: 1px solid #d8c9b8;
+            font-size: 0.95rem;
+            color: #3f3127;
+        }
+        .modern-note div {
+            flex: 1 1 240px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .modern-note strong {
+            font-family: 'Georgia', serif;
+            color: #4d2e19;
+            font-size: 1.02rem;
+        }
+
+        .footer-line {
+            margin-top: 2.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #b6a392;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-top: 1px solid #e3d5c4;
+            padding-top: 1.2rem;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        @media (max-width: 700px) {
+            .scroll-container { padding: 4rem 1.4rem 2rem; border-radius: 2rem; }
+            h1 { font-size: 2rem; }
+            .bookmark { width: 38px; height: 96px; right: 24px; top: -18px; }
+            .bookmark::before { font-size: 1.3rem; }
+            .genus-grid, .genres-grid { grid-template-columns: 1fr; }
+            .howto-box { flex-direction: column; padding: 1.8rem; }
+            .modern-note { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-container">
+        <!-- Закладка (секретный триггер) -->
+        <div class="bookmark" id="bookmark" aria-hidden="true"></div>
+
+        <h1>
+            Роды и жанры литературы
+            <span class="sub">путеводитель по мирам слова</span>
+        </h1>
+
+        <div class="lead">
+            Род — это стратегия: кто говорит и как. Жанр — тактика: что именно за произведение.
+            Разберёмся в двух главных понятиях литературоведения — кратко, но по-книжному уютно.
+        </div>
+
+        <div class="genus-grid">
+            <div class="genus-card">
+                <h2><span>📖</span> Эпос</h2>
+                <div class="genus-sub">повествование · событие</div>
+                <div class="genus-desc">
+                    <strong>Объективный рассказ</strong> о событиях, происходящих с персонажами во времени и пространстве.
+                    Автор смотрит со стороны, как наблюдатель. В центре — сюжет, поступки героев, исторический контекст.
+                    Повествователь (или рассказчик) ведёт речь, но его не путают с самим автором.
+                </div>
+                <div class="genus-examples">роман · повесть · рассказ · новелла · эпопея · очерк · басня</div>
+            </div>
+
+            <div class="genus-card">
+                <h2><span>🎭</span> Лирика</h2>
+                <div class="genus-sub">переживание · чувство</div>
+                <div class="genus-desc">
+                    <strong>Субъективный мир чувств и эмоций</strong>. Сюжет (если он есть) отходит на второй план —
+                    главное переживание лирического героя. Речь обычно от первого лица, но это не автор, а образ.
+                    В центре — настроения, размышления, внутренняя жизнь.
+                </div>
+                <div class="genus-examples">стихотворение · элегия · ода · сонет · эпиграмма · мадригал</div>
+            </div>
+
+            <div class="genus-card">
+                <h2><span>🎬</span> Драма</h2>
+                <div class="genus-sub">действие · конфликт</div>
+                <div class="genus-desc">
+                    <strong>Изображение действия в развитии</strong>, предназначенное для сцены. О персонажах узнаём
+                    из их реплик, монологов и поступков. В основе — конфликт (столкновение сил, характеров, идей),
+                    который разворачивается «здесь и сейчас» перед зрителем.
+                </div>
+                <div class="genus-examples">трагедия · комедия · драма · трагикомедия · водевиль</div>
+            </div>
+
+            <div class="genus-card">
+                <h2><span>🌀</span> Лиро-эпика</h2>
+                <div class="genus-sub">смешанный род</div>
+                <div class="genus-desc">
+                    <strong>Сюжет + лирическое начало</strong>. Сочетает эпическую масштабность (события, герои)
+                    с сильным эмоциональным переживанием. Есть повествование, но оно пронизано чувством.
+                </div>
+                <div class="genus-examples">поэма · роман в стихах · баллада</div>
+            </div>
+        </div>
+
+        <div class="section-heading">Жанры внутри родов</div>
+
+        <div class="genres-grid">
+            <div class="genre-block">
+                <h3><i>📘</i> Эпические</h3>
+                <ul class="genre-list">
+                    <li><strong>Роман</strong> <span>крупное произведение, широкий круг событий, много героев и сюжетных линий.</span></li>
+                    <li><strong>Повесть</strong> <span>средний жанр, обычно одна сюжетная линия, но событий больше, чем в рассказе.</span></li>
+                    <li><strong>Рассказ</strong> <span>малая форма, чаще об одном событии или эпизоде.</span></li>
+                    <li><strong>Новелла</strong> <span>малый жанр с острым сюжетом и неожиданной, парадоксальной развязкой.</span></li>
+                    <li><strong>Очерк</strong> <span>документальный жанр, основанный на реальных фактах.</span></li>
+                    <li><strong>Эпопея</strong> <span>монументальное полотно о ключевых событиях истории народа.</span></li>
+                </ul>
+            </div>
+
+            <div class="genre-block">
+                <h3><i>🎨</i> Лирические</h3>
+                <ul class="genre-list">
+                    <li><strong>Стихотворение</strong> <span>основная форма лирики, выражает переживание.</span></li>
+                    <li><strong>Ода</strong> <span>торжественное, хвалебное стихотворение.</span></li>
+                    <li><strong>Элегия</strong> <span>грустное, задумчивое размышление о жизни, любви, смерти.</span></li>
+                    <li><strong>Сонет</strong> <span>строгая форма из 14 строк (2 четверостишия и 2 трёхстишия).</span></li>
+                    <li><strong>Эпиграмма</strong> <span>короткое сатирическое стихотворение.</span></li>
+                    <li><strong>Послание</strong> <span>стихотворное письмо к конкретному лицу.</span></li>
+                </ul>
+            </div>
+
+            <div class="genre-block">
+                <h3><i>🎭</i> Драматические</h3>
+                <ul class="genre-list">
+                    <li><strong>Трагедия</strong> <span>непримиримый конфликт, трагический финал (часто смерть героя).</span></li>
+                    <li><strong>Комедия</strong> <span>конфликт разрешается смехом, счастливый финал; бывает положений и характеров.</span></li>
+                    <li><strong>Драма</strong> <span>серьёзный конфликт, но не столь фатальный, как в трагедии; финал может быть разным.</span></li>
+                    <li><strong>Водевиль</strong> <span>лёгкая комедия с песнями и танцами.</span></li>
+                </ul>
+            </div>
+
+            <div class="genre-block">
+                <h3><i>✨</i> Лиро-эпические</h3>
+                <ul class="genre-list">
+                    <li><strong>Баллада</strong> <span>стихотворный рассказ с драматическим (часто фантастическим или героическим) сюжетом.</span></li>
+                    <li><strong>Поэма</strong> <span>крупное стихотворное произведение с сюжетом.</span></li>
+                    <li><strong>Роман в стихах</strong> <span>крупный жанр, сочетающий эпическую масштабность и лирическую исповедь.</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="howto-box">
+            <div class="howto-step">
+                <div class="howto-num">1</div>
+                <div class="howto-text">
+                    Смотрим на речь
+                    <small>история → эпос · чувства → лирика · диалог → драма</small>
+                </div>
+            </div>
+            <div class="howto-step">
+                <div class="howto-num">2</div>
+                <div class="howto-text">
+                    Смотрим на объём и сюжет
+                    <small>много событий → роман · одно событие → рассказ · нет сюжета → стихотворение</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="modern-note">
+            <div><strong>Современная ситуация:</strong> границы размываются — роман-эссе, фанфик, нон-фикшн, сетевые теги (фэнтези, попаданцы).</div>
+            <div><strong>Запомнить:</strong> род = кто говорит и как, жанр = что именно.</div>
+        </div>
+
+        <div class="footer-line">· литературная мастерская ·</div>
+    </div>
+
+    <!-- Всплывающее фото (секрет) -->
+    <div class="surprise-overlay" id="surpriseOverlay">
+        <img
+            src="https://avatars.mds.yandex.net/i?id=5e6f431a9c6daecb07348afa10b7d66c_l-5282198-images-thumbs&n=13"
+            alt=""
+        >
+    </div>
+
+    <script>
+        (function() {
+            const bookmark = document.getElementById('bookmark');
+            const overlay = document.getElementById('surpriseOverlay');
+
+            let clicks = 0;
+            const TARGET = 10;
+            let hideTimer = null;
+            let isShowing = false;
+
+            bookmark.addEventListener('click', function() {
+                if (isShowing) return; // не считаем клики, пока показывается фото
+
+                clicks++;
+
+                if (clicks >= TARGET) {
+                    clicks = 0;
+                    isShowing = true;
+
+                    overlay.classList.add('visible');
+
+                    clearTimeout(hideTimer);
+                    hideTimer = setTimeout(() => {
+                        overlay.classList.remove('visible');
+                        setTimeout(() => { isShowing = false; }, 400);
+                    }, 2000);
+                }
+            });
+
+            // Закрыть раньше — клик по фону
+            overlay.addEventListener('click', function() {
+                overlay.classList.remove('visible');
+                clearTimeout(hideTimer);
+                setTimeout(() => { isShowing = false; }, 400);
+            });
+        })();
+    </script>
+</body>
+</html>
